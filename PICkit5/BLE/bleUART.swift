@@ -256,11 +256,8 @@ public class bleUART: NSObject, BLEAdapterDelegate {
         }
         
         if(timer == nil){
-            //timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(bleUART.TimerSelector), userInfo: nil, repeats: true)
-            
             if(commandID == .BLE_PTG_LOAD_IMAGE || commandID == .BLE_PTG_REINIT){
                 AckTime = 5.0
-                //timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(bleUART.TimerSelector), userInfo: nil, repeats: false)
             }
             else if (commandID == .BLE_PTG_GO){
                 AckTime = 60.0
@@ -487,84 +484,6 @@ public class bleUART: NSObject, BLEAdapterDelegate {
                             self.callback?.bleCommandResponseData?(command: self.PICkitCommand.rawValue, data: sdFiles)
                         }
                     }
-                    /*
-                    if(!self.GetResponseData){
-                        if let PICkitResp = PICkit_Command_Response.parsing(dat: data){
-                            
-                            self.CancelTimer()
-                            
-                            if PICkitResp.opcode != self.PICkitCommand.rawValue{
-                                print("Invalid state")
-                                self.PTGCommandErrorHandler(title: self.commandStr[Int(self.PICkitCommand.rawValue)], message: "Invalid state, resp data = " + data.hexEncodedString())
-                            }
-                            else if(PICkitResp.status == PICkit_Response.BLE_PTG_RESP_DATA.rawValue){
-                                self.GetResponseData = true
-                                self.ResponseData.append(Data(PICkitResp.parameters))
-                                print("ok")
-                            }
-                            else{
-                                if((PICkitResp.status == PICkit_Response.BLE_PTG_RESP_OK.rawValue) && PICkitResp.parameters.isEmpty){
-                                    print("Can't find PTG files or folders")
-                                    self.callback?.bleCommandResponse?(command: self.PICkitCommand.rawValue, data: Data())
-                                    return
-                                }
-                                
-                                print("Error response = \(PICkitResp.status)")
-                                print("PICkit command ID = \(self.PICkitCommand)")
-                                self.PTGCommandErrorHandler(title: self.commandStr[Int(self.PICkitCommand.rawValue)], message: String(format: "Error: Response data = %x", PICkitResp.status))
-                            }
-                        }
-                        else{
-                            print("Can't parse responsed data. \(data as NSData)")
-                            self.PTGCommandErrorHandler(title: "Can't parse responsed data", message: data.hexEncodedString())
-                        }
-                    }
-                    else{
-                        if let PICkitResp = PICkit_Command_Response.parsing(dat: data){
-                            if(PICkitResp.opcode == PICkit_OpCode.BLE_PTG_BROWSE_SD_CARD.rawValue){
-                                
-                                if(PICkitResp.status == PICkit_Response.BLE_PTG_RESP_OK.rawValue){
-                                    print("[0x04, 0x80],End")
-                                    self.ResponseData.append(data)
-                                }
-                                else if(PICkitResp.status == PICkit_Response.BLE_PTG_RESP_DATA.rawValue){
-                                    print(".")
-                                    self.ResponseData.append(Data(PICkitResp.parameters))
-                                }
-                            }
-                        }
-                        else{
-                            print("Can't parse responsed data. \(data as NSData)")
-                            self.PTGCommandErrorHandler(title: "Can't parse responsed data", message: data.hexEncodedString())
-                        }
-                    }
-                    
-                    print("Browse sd card. response = \(self.ResponseData as NSData)")
-                    
-                    if(!self.ResponseData.isEmpty){
-                        let RespOk = (self.ResponseData as NSData).subdata(with: NSMakeRange(self.ResponseData.count-2, 2))
-                        print("Response ok? = \(RespOk as NSData)")
-                        if(RespOk == Data([PICkit_OpCode.BLE_PTG_BROWSE_SD_CARD.rawValue, PICkit_Response.BLE_PTG_RESP_OK.rawValue])){
-                            print("YES")
-                            
-                            let files = self.ResponseData.hexEncodedString()
-                            print("ptg_files = " + files)
-                            print("length = \(self.ResponseData.count)")
-                            
-                            self.PICkit_WriteCommandResponse(result: true)
-                            
-                            self.SD_card_files = (self.ResponseData as NSData).subdata(with:NSMakeRange(0, self.ResponseData.count-2))
-                            print("SD_files  = \(self.SD_card_files as NSData)")
-                            
-                            let sdFiles = self.SD_card_split_files(sd_data: self.SD_card_files)
-                            
-                            if sdFiles.isEmpty{
-                                self.callback?.bleCommandResponse?(command: self.PICkitCommand.rawValue, data: Data())
-                            }else{
-                                self.callback?.bleCommandResponseData?(command: self.PICkitCommand.rawValue, data: sdFiles)
-                            }
-                        }
-                    }*/
                 }
                 else if(self.PICkitCommand == .BLE_PTG_GO){
                     //print("[PTG GO]Get data.\(self.GetResponseData)")
@@ -577,80 +496,53 @@ public class bleUART: NSObject, BLEAdapterDelegate {
                     self.DataLog.append(data)
                     
                     if(self.DataLog.count > 4){
-                    let opCode = self.DataLog[0]
-                    if(opCode != self.PICkitCommand.rawValue){
-                        //print("opCode error")
-                        self.PTGCommandErrorHandler(title: self.commandStr[Int(self.PICkitCommand.rawValue)], message: "Invalid state, resp data = " + data.hexEncodedString())
-                        return
-                    }
-                    let respData = self.DataLog[1]
-                    if(respData == PICkit_Response.BLE_PTG_RESP_DATA.rawValue){
-                        if(self.DataLog.count > 4){
-                            let dataLen = Int(self.DataLog[2]) + Int(self.DataLog[3] << 8)
-                            print("BLE_PTG_GO, data response, dataLen = \(dataLen)")
-                            
-                            if(self.DataLog.count >= (dataLen+4)){
-                                let dataLog = self.DataLog[4..<(dataLen+4)]
-                                let len = self.DataLog.count
-                                let result = self.DataLog[dataLen+4..<len]
+                        let opCode = self.DataLog[0]
+                        if(opCode != self.PICkitCommand.rawValue){
+                            //print("opCode error")
+                            self.PTGCommandErrorHandler(title: self.commandStr[Int(self.PICkitCommand.rawValue)], message: "Invalid state, resp data = " + data.hexEncodedString())
+                            return
+                        }
+                        let respData = self.DataLog[1]
+                        if(respData == PICkit_Response.BLE_PTG_RESP_DATA.rawValue){
+                            if(self.DataLog.count > 4){
+                                let dataLen = Int(self.DataLog[2]) + Int(self.DataLog[3] << 8)
+                                print("BLE_PTG_GO, data response, dataLen = \(dataLen)")
                                 
-                                self.callback?.bleCommandResponse?(command: self.PICkitCommand.rawValue, data: dataLog)
-                                
-                                //print("result = \(result as NSData)")
-                                if(result.count == 2){
-                                    if (result == Data([0x06,0x80])){
-                                        print("pass packet")
-                                        self.PICkit_WriteCommandResponse(result: true)
-                                    }
-                                    else if (result == Data([0x06,0x99])){
-                                        //print("fail packet")
-                                        self.PICkit_WriteCommandResponse(result: false)
-                                    }
-                                    //print("\(result[0]),\(result[1])")
-                                    /*if(result[0] == self.PICkitCommand.rawValue){
-                                        if(result[1] == PICkit_Response.BLE_PTG_RESP_OK.rawValue){
-                                            print("Response OK!")
+                                if(self.DataLog.count >= (dataLen+4)){
+                                    let dataLog = self.DataLog[4..<(dataLen+4)]
+                                    let len = self.DataLog.count
+                                    let result = self.DataLog[dataLen+4..<len]
+                                    
+                                    self.callback?.bleCommandResponse?(command: self.PICkitCommand.rawValue, data: dataLog)
+                                    
+                                    //print("result = \(result as NSData)")
+                                    if(result.count == 2){
+                                        if (result == Data([0x06,0x80])){
+                                            print("pass packet")
                                             self.PICkit_WriteCommandResponse(result: true)
                                         }
-                                        else{
-                                            print("Response error = " + String(format: "0x%x", result[1]))
+                                        else if (result == Data([0x06,0x99])){
+                                            //print("fail packet")
                                             self.PICkit_WriteCommandResponse(result: false)
                                         }
-                                    }*/
+                                    }
                                 }
-                                /*
-                                print("Data log: done. len = \(self.DataLog.count)")
-                                self.DataLog = self.DataLog.advanced(by: dataLen+4)
-                                
-                                if(self.DataLog.count == 2){
-                                    if(self.DataLog[0] == self.PICkitCommand.rawValue){
-                                        if(self.DataLog[1] == PICkit_Response.BLE_PTG_RESP_OK.rawValue){
-                                            print("Response OK!")
-                                            self.PICkit_WriteCommandResponse(result: true)
-                                        }
-                                        else{
-                                            print("Response error = " + String(format: "0x%x", self.DataLog[1]))
-                                            self.PICkit_WriteCommandResponse(result: false)
-                                        }
-                                    }
-                                }*/
+                                else{
+                                    print("Data not complete_1!")
+                                }
                             }
                             else{
-                                print("Data not complete_1!")
+                                print("Data not complete_2!")
                             }
                         }
                         else{
-                            print("Data not complete_2!")
+                            if(respData == PICkit_Response.BLE_PTG_RESP_OK.rawValue){
+                                print("Response OK!")
+                            }
+                            else{
+                                print("Response error")
+                            }
                         }
-                    }
-                    else{
-                        if(respData == PICkit_Response.BLE_PTG_RESP_OK.rawValue){
-                            print("Response OK!")
-                        }
-                        else{
-                            print("Response error")
-                        }
-                    }
                     }
                 }
             }
@@ -688,7 +580,6 @@ public class bleUART: NSObject, BLEAdapterDelegate {
     }
     
     func SD_card_split_files(sd_data: Data) -> [String]{
-        //let dd = sd_data.split(separator: 0x20)
         if(sd_data.count == 1 && sd_data[0] == 0x00){
             //Empty data
             print("[Browse folder] data is empty")
@@ -706,7 +597,6 @@ public class bleUART: NSObject, BLEAdapterDelegate {
                 if(bytes[0] != PICkit_OpCode.BLE_PTG_BROWSE_SD_CARD.rawValue && bytes[1] != PICkit_Response.BLE_PTG_RESP_DATA.rawValue){
                     let file_str = String(decoding: file, as: UTF8.self)
                     print("file_str = \(file_str)")
-                    //if(file_str != "System Volume Information" && file_str != "<TRUNCATED>"){
                     if(file_str != "System Volume Information"){
                         files.append(String(decoding: file, as: UTF8.self))
                     }

@@ -109,7 +109,6 @@ class ScanDeviceVC: UIViewController, UITableViewDelegate, UITableViewDataSource
         print("BLE Scan indicator = \(ScanState)")
         
         if(self.activityIndicator == nil && ScanState == true){
-            //self.activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
             self.activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
             self.activityIndicator!.color = .white
             let barButton = UIBarButtonItem(customView: self.activityIndicator!)
@@ -157,7 +156,6 @@ class ScanDeviceVC: UIViewController, UITableViewDelegate, UITableViewDataSource
 
         #if !targetEnvironment(simulator)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            //self.bleUart?.bleScan(scanTimeout: 60, scanConfig: .ScanWithoutFilter)
             self.bleUart?.bleScan(ScanFilter: self.ScanFilterString)
         }
         #endif

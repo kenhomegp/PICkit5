@@ -191,25 +191,6 @@ class StatusViewController: UIViewController, bleUARTCallBack, UITableViewDelega
     @IBAction func RunButtonTapped(_ sender: Any) {
         #if !targetEnvironment(simulator)
             ShowToast(message: "Programming started!")
-            /*
-            if(!self.deviceLog.text.isEmpty){
-                self.deviceLog.text.removeAll()
-            }
-            PTGRun = true
-            statusHeader.reloadData()
-            BLE_PTG_GO()
-             */
-            /*
-            let okHandler: ((UIAlertAction) -> Void)? = { (_) in
-                if(!self.deviceLog.text.isEmpty){
-                    self.deviceLog.text.removeAll()
-                }
-                self.PTGRun = true
-                self.statusHeader.reloadData()
-                self.BLE_PTG_GO()
-            }
-            self.PICkit_Custom_Alert(title: "Programming started!", content: "", oneButton: true, image: "Logo", ok_handler: okHandler, cancel_handler: nil)
-             */
         #else
             PTGRun = !PTGRun
             statusHeader.reloadData()
@@ -353,11 +334,9 @@ class StatusViewController: UIViewController, bleUARTCallBack, UITableViewDelega
             if let log = deviceLog.text{
                 if(log.lowercased().contains("fail")){
                     print("Programming failed")
-                    //bleUart?.CancelTimer()
                     bleUart?.PICkit_WriteCommandResponse(result: false)
                 }
                 else if((log.lowercased().contains("pass")) || (log.lowercased().contains("success"))){
-                    //bleUart?.CancelTimer()
                     print("Programming success")
                 }
             }

@@ -38,8 +38,6 @@ class FileManagerViewController: UIViewController, bleUARTCallBack, UITableViewD
     
     var ActivePTG_Directory_Path = Data()
     
-    //var FolderIsSelect = false
-    
     enum PTGDisplayMode{
         case All
         case Image
@@ -116,8 +114,6 @@ class FileManagerViewController: UIViewController, bleUARTCallBack, UITableViewD
         print("[viewWillAppear] Selected PTG = \(self.SelectedFile ?? "")")
         
         print("PTGActiveFile = \(self.PTGActiveFile)")
-        
-        //self.PTGActiveFile = "0:/abc/de/fgh/i/123.ptg"    //Debug
         
         GetFilePath(ptgName: self.PTGActiveFile)
         
@@ -366,12 +362,6 @@ class FileManagerViewController: UIViewController, bleUARTCallBack, UITableViewD
                 print(substring)
                 ActivePTG_Directory_Path = Data(substring.utf8)
                 print("ActivePTG_Directory_Path = \(ActivePTG_Directory_Path as NSData)")
-                /*if substring == "0:"{
-                    return Data([0x30,0x3a])
-                }
-                else{
-                    return Data(substring.utf8)
-                }*/
             }
         }
     }
@@ -552,11 +542,6 @@ class FileManagerViewController: UIViewController, bleUARTCallBack, UITableViewD
             if(FilterPTGDone){
                 FilterPTGDone = false
             }
-            /*
-            print("didSelectPTG.\(cell.PTGFileName.text ?? "")")
-            self.PTGLastSelected = cell.PTGFileName.text
-            self.PTGActiveFile = self.PTGLastSelected
-            */
             if((cell.PTGFileName.text?.lowercased().contains(".ptg")) == true){
                 print("didSelectPTG.\(cell.PTGFileName.text ?? "")")
                 self.PTGLastSelected = cell.PTGFileName.text
@@ -593,8 +578,6 @@ class FileManagerViewController: UIViewController, bleUARTCallBack, UITableViewD
                 print("This is PTG folder.\(SelectedFile ?? "")")
                 
                 cell.accessoryType = .none
-                
-                //FolderIsSelect = true
                 
                 self.SDCardFileListTable.reloadData()
                 
