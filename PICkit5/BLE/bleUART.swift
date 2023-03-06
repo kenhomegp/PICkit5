@@ -247,7 +247,11 @@ public class bleUART: NSObject, BLEAdapterDelegate {
     public func PICkit_WriteCommand(commandID: PICkit_OpCode, commandData: Data, completion: @escaping (PICkitError?)-> Void){
         self.TaskUARTCallback = completion
         
-        var AckTime = 2.0
+        //var AckTime = 2.0
+        
+        if(commandID == .BLE_PTG_INIT || commandID == .BLE_PTG_UNINIT){
+            PTGError = false
+        }
         
         if(PTGError){
             let error = self.commandStr[Int(self.PICkitCommand.rawValue)] + "/PTG Error"
@@ -255,18 +259,16 @@ public class bleUART: NSObject, BLEAdapterDelegate {
             return
         }
         
+        /*
         if(timer == nil){
             if(commandID == .BLE_PTG_LOAD_IMAGE || commandID == .BLE_PTG_REINIT){
                 AckTime = 5.0
             }
-            //else if (commandID == .BLE_PTG_GO){
-            //    AckTime = 60.0
-            //}
 
             if(commandID != .BLE_PTG_GO){
                 timer = Timer.scheduledTimer(timeInterval: AckTime, target: self, selector: #selector(bleUART.TimerSelector), userInfo: nil, repeats: false)
             }
-        }
+        }*/
         
         print("PICkit_WriteCommand. comdID = \(commandID),data = \(String(decoding: commandData, as: UTF8.self))")
         
@@ -365,12 +367,12 @@ public class bleUART: NSObject, BLEAdapterDelegate {
     }
 
     func OnConnected(_ connectionStatus: Bool, message: String) {
+        PTGError = false
         if(connectionStatus) {
             print("[connectionStatus] Connected")
         }
         else {
             print("[connectionStatus] Disconnect. msg = \(message)")
-            PTGError = false
             callback?.bleDidDisconnect?(error: message)
         }
     }
