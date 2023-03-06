@@ -259,11 +259,13 @@ public class bleUART: NSObject, BLEAdapterDelegate {
             if(commandID == .BLE_PTG_LOAD_IMAGE || commandID == .BLE_PTG_REINIT){
                 AckTime = 5.0
             }
-            else if (commandID == .BLE_PTG_GO){
-                AckTime = 60.0
-            }
+            //else if (commandID == .BLE_PTG_GO){
+            //    AckTime = 60.0
+            //}
 
-            timer = Timer.scheduledTimer(timeInterval: AckTime, target: self, selector: #selector(bleUART.TimerSelector), userInfo: nil, repeats: false)
+            if(commandID != .BLE_PTG_GO){
+                timer = Timer.scheduledTimer(timeInterval: AckTime, target: self, selector: #selector(bleUART.TimerSelector), userInfo: nil, repeats: false)
+            }
         }
         
         print("PICkit_WriteCommand. comdID = \(commandID),data = \(String(decoding: commandData, as: UTF8.self))")
