@@ -58,9 +58,7 @@ class ScanDeviceVC: UIViewController, UITableViewDelegate, UITableViewDataSource
         self.title = "Available devices"
         
         #if targetEnvironment(simulator)
-            peripherals.add("PICkit5_001")
-            peripherals.add("PICkit5_002")
-            peripherals.add("PICkit5_003")
+            peripherals.add("SN: 000000119")
             self.deviceList.reloadData()
         #else
             if bleUart == nil{
@@ -211,7 +209,9 @@ class ScanDeviceVC: UIViewController, UITableViewDelegate, UITableViewDataSource
         cell.addSubview(additionalSeparator)
         
         #if targetEnvironment(simulator)
-        cell.deviceName.text = "Serial number: 0000000" + String(indexPath.row)
+            //cell.deviceName.text = "Serial number: 0000000" + String(indexPath.row)
+            cell.deviceName.text = "SN: 000000119"
+            cell.detailTextLabel?.text = "RSSI: -69 dBm"
         #else
             let dev = peripherals.object(at: indexPath.row) as! Microchip_Peripheral
             print("PICkit5 device name = \(dev.deviceName ?? "")")

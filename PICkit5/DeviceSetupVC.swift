@@ -339,10 +339,12 @@ class DeviceSetupVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                     cell.configLabel.text! += "\nAPP version: v"
                     cell.configLabel.text! += version
                 }
+                
                 if let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
                     
-                    cell.configLabel.text! += "."
-                    cell.configLabel.text! += build
+                    //cell.configLabel.text! += "."
+                    //cell.configLabel.text! += build
+                    print("build number = \(build)")
                 }
                 
                 #else
